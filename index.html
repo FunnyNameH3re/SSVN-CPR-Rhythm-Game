@@ -1,12 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>CPR Rhythm Game</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPR Rhythm Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="beat-indicator"></div>
-  <div id="score">Score: 0</div>
-  <script src="game.js"></script>
+    <!-- Gameplay Scene -->
+    <div id="gameplay-scene" class="scene">
+        <h1>CPR Rhythm Game</h1>
+        <p>Listen to the playlist on Spotify (optional):</p>
+        <iframe
+            data-testid="embed-iframe"
+            style="border-radius:12px"
+            src="https://open.spotify.com/embed/playlist/5ADlKRNIRXr4LroBNhV2Pl?utm_source=generator"
+            width="100%"
+            height="352"
+            frameBorder="0"
+            allowfullscreen=""
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+        ></iframe>
+
+        <!-- Dummy Selection -->
+        <div style="margin: 10px 0;">
+            <label><input type="radio" name="dummy" value="male" checked> Male Dummy</label>
+            <label><input type="radio" name="dummy" value="female"> Female Dummy</label>
+        </div>
+        <!-- Metronome Sound Toggle -->
+        <div style="margin: 10px 0;">
+            <label><input type="checkbox" id="metronome-toggle"> Enable Metronome Sound</label>
+        </div>
+
+        <!-- Dummy Image and Gameplay Button -->
+        <div style="position: relative; display: inline-block; margin-top: 20px;">
+            <img id="game-image" src="assets/maledummy.png" alt="CPR Demo">
+            <button id="gameplay-button" class="circle-button"></button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
 </body>
 </html>
