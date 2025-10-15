@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameImage = document.getElementById('game-image');
     const dummyRadios = document.querySelectorAll('input[name="dummy"]');
     const metronomeToggle = document.getElementById('metronome-toggle');
+    const gameContainer = document.querySelector('#gameplay-scene');
 
     // Web Audio API for metronome sound
     let audioContext = null;
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let clicks = [];
     const bpm = 100; // Fixed BPM
     const beatInterval = (60 / bpm) * 1000; // Convert BPM to milliseconds
+    const buttonRadius = 40; // Radius of the invisible button (half of width/height)
 
     // Initialize Web Audio API on first user interaction
     function initAudioContext() {
@@ -55,27 +57,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Make the button invisible
+    gameplayButton.style.backgroundColor = 'transparent';
+    gameplayButton.style.border = 'none';
+    gameplayButton.style.outline = 'none';
+
     // Start the game
-    gameplayButton.addEventListener('click', () => {
+    gameContainer.addEventListener('click', (event) => {
         if (!isGameRunning) {
-            // Initialize AudioContext on first click
             initAudioContext();
             startGame();
-        } else {
-            // Record click time for scoring
+            return;
+        }
+
+        // Get button position and dimensions
+        const buttonRect = gameplayButton.getBoundingClientRect();
+        const buttonCenterX = buttonRect.left + buttonRect.width / 2;
+        const buttonCenterY = buttonRect.top + buttonRect.height / 2;
+
+        // Calculate distance from click to button center
+        const clickX = event.clientX;
+        const clickY = event.clientY;
+        const distance = Math.sqrt(
+            Math.pow(clickX - buttonCenterX, 2) +
+            Math.pow(clickY - buttonCenterY, 2)
+        );
+
+        // Check if click is within the button radius
+        if (distance <= buttonRadius) {
             const now = Date.now();
             clicks.push(now);
-            checkClickAccuracy(now);
-            flashButton(); // Flash on player click
+            checkClickAccuracy(now); // Only check beat accuracy if clicked in the right area
+        } else {
+            showFeedback(false, "Wrong area! Click the correct CPR spot.");
         }
     });
 
     // Start the metronome and game
     function startGame() {
         isGameRunning = true;
-        gameplayButton.textContent = 'Press Me!';
-        gameplayButton.style.backgroundColor = '#4CAF50';
-
+        gameplayButton.textContent = '';
         metronomeInterval = setInterval(() => {
             lastBeatTime = Date.now();
 
@@ -86,32 +107,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }, beatInterval);
     }
 
-    // Flash the button on player click
-    function flashButton() {
-        gameplayButton.style.backgroundColor = '#ff5252'; // Red flash
-        setTimeout(() => {
-            gameplayButton.style.backgroundColor = '#4CAF50'; // Back to green
-        }, 100);
-    }
-
-    // Show visual feedback (Good!/Missed!)
-    function showFeedback(isGood) {
+    // Show visual feedback (Good!/Wrong area!/Missed!)
+    function showFeedback(isGood, message) {
         const feedback = document.createElement('div');
-        feedback.style.position = 'fixed';
-        feedback.style.top = '50%';
-        feedback.style.left = '50%';
-        feedback.style.transform = 'translate(-50%, -50%)';
-        feedback.style.fontSize = '24px';
-        feedback.style.fontWeight = 'bold';
-        feedback.style.color = isGood ? 'green' : 'red';
-        feedback.style.zIndex = '100';
-        feedback.textContent = isGood ? 'Good!' : 'Missed!';
+        feedback.classList.add('feedback');
+        feedback.classList.add(isGood ? 'feedback-good' : 'feedback-bad');
+        feedback.textContent = message;
         document.body.appendChild(feedback);
 
         setTimeout(() => {
             feedback.remove();
-        }, 500);
+        }, 500); // Disappear after 500ms
     }
+
 
     // Check if the player clicked close to the beat
     function checkClickAccuracy(clickTime) {
@@ -120,20 +128,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (Math.abs(timeSinceLastBeat) < accuracyThreshold) {
             score++;
-            console.log(`Good click! Score: ${score}`);
-            showFeedback(true); // Show "Good!"
+            showFeedback(true, "Good!");
+            // Temporarily show the button
+            gameplayButton.classList.add('visible');
+            setTimeout(() => {
+                gameplayButton.classList.remove('visible');
+            }, 500); // Hide after 500ms
         } else {
-            console.log('Missed the beat!');
-            showFeedback(false); // Show "Missed!"
+            showFeedback(false, "Missed the beat!");
         }
     }
+
+
 
     // End the game (for demo purposes, after 30 seconds)
     setTimeout(() => {
         clearInterval(metronomeInterval);
         isGameRunning = false;
         gameplayButton.textContent = 'Game Over';
-        gameplayButton.style.backgroundColor = '#f44336';
         alert(`Game Over! Your score: ${score}`);
     }, 30000); // 30 seconds
 });

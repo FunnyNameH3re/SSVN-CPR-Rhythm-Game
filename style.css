@@ -46,3 +46,34 @@ body {
     font-weight: bold;
     margin-left: 10px;
 }
+
+/* Feedback styling */
+.feedback {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    padding: 8px 16px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    white-space: nowrap;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.feedback-good {
+    color: #4CAF50;
+}
+
+.feedback-bad {
+    color: #f44336;
+}
+
+/* Temporary button visibility */
+#gameplay-button.visible {
+    background-color: rgba(76, 175, 80, 0.5) !important;
+    border: 2px solid #4CAF50 !important;
+}
